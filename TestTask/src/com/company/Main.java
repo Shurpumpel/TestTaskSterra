@@ -4,8 +4,8 @@ public class Main {
     public static void main(String[] args) throws InterruptedException {
         ListData list = new ListData();
 
-        Thread thread1 = new MyThread(true, list);
-        Thread thread2 = new MyThread(false, list);
+        Thread thread1 = new MyThread(FirstOrLast.first, list);
+        Thread thread2 = new MyThread(FirstOrLast.last, list);
 
         thread1.start();
         thread2.start();

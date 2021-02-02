@@ -2,55 +2,53 @@ package com.company;
 
 
 public class MyThread extends Thread{
-    private final boolean isStartFromBegin;
     private int countOfCheckedValues = 0;
     private int countOfZerosOrOnes = 0;
     private ListData list;
+    private FirstOrLast firstOrLast;
 
 
 
-    public MyThread(boolean isStartFromBegin, ListData list) {
-        this.isStartFromBegin = isStartFromBegin;
+    public MyThread(FirstOrLast firstOrLast, ListData list) {
+        this.firstOrLast = firstOrLast;
         this.list = list;
     }
 
     @Override
     public void run() {
-        if(isStartFromBegin)
-            this.firstThreadWork();
-        else
-            this.secondThreadWork();
-    }
-
-    private void firstThreadWork(){
-        while(list.isListNotNull()) {
-            String binaryString = Integer.toBinaryString(list.getFirstAndRemove());
-            this.countOfZerosOrOnes += getCountOfZerosOrOnes(binaryString, true);
-            countOfCheckedValues++;
+        try {
+            while (true) {
+                this.countOfZerosOrOnes += getCountOfZerosOrOnes(
+                        list.getFirstOrLastAndRemove(this.firstOrLast));
+                countOfCheckedValues++;
+            }
+        }catch (IndexOutOfBoundsException ignored){
+        }catch (Exception e){
+            System.out.println(e.getMessage());
         }
     }
 
-    private void secondThreadWork(){
-        while(list.isListNotNull()){
-            String binaryString = Integer.toBinaryString(list.getLastAndRemove());
-            this.countOfZerosOrOnes += getCountOfZerosOrOnes(binaryString, false);
-            countOfCheckedValues++;
-        }
-    }
-
-    private int getCountOfZerosOrOnes(String binaryString, boolean isSearchingZeros){
-        char goodValue;
-        if(isSearchingZeros)
-            goodValue = '0';
-        else
-            goodValue = '1';
-
+    private int getCountOfZerosOrOnes(int value) throws Exception {
         int count = 0;
-        for (int i = 0; i < binaryString.length(); i++) {
-            if(binaryString.charAt(i) == goodValue)
-                count++;
+        int numberOfCheckedBits = 32 - Integer.numberOfLeadingZeros(value);
+        switch (this.firstOrLast){
+            case first:
+                for (int i = 0; i < numberOfCheckedBits; i++) {
+                    if((value & 1) == 0)
+                        count++;
+                    value >>>= 1;
+                }
+                break;
+            case last:
+                for (int i = 0; i < numberOfCheckedBits; i++) {
+                    if((value & 1) == 1)
+                        count++;
+                    value >>>= 1;
+                }
+                break;
+            default:
+                throw new Exception("Only first or last MyThread.getCountOfZerosIrOnes()");
         }
-
         return count;
     }
 
@@ -58,13 +56,11 @@ public class MyThread extends Thread{
     @Override
     public String toString() {
         String out = "Thread";
-        if(this.isStartFromBegin){
-            out+="1:\n" +
-                    "\tCount of zeros: " + this.countOfZerosOrOnes+"\n" +
-                    "\tCount of checked values:" + this.countOfCheckedValues+"\n";
-        }
-        else {
-            out += "2\n" +
+        switch (this.firstOrLast) {
+            case first -> out += "1:\n" +
+                    "\tCount of zeros: " + this.countOfZerosOrOnes + "\n" +
+                    "\tCount of checked values:" + this.countOfCheckedValues + "\n";
+            case last -> out += "2\n" +
                     "\tCount of ones: " + this.countOfZerosOrOnes + "\n" +
                     "\tCount of checked values:" + this.countOfCheckedValues + "\n";
         }

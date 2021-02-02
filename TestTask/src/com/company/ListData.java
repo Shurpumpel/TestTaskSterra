@@ -1,43 +1,39 @@
 package com.company;
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Random;
 
 public class ListData {
-    private List<Integer> list = new LinkedList<>();
-    private int size = 1000;
+    private LinkedList<Integer> list = new LinkedList<>();
+    private final int SIZE = 1000;
+    private final int listValuesRange = 100;
 
     public ListData(){
         Random random = new Random();
-        for (int i = 0; i < this.size; i++) {
-            this.list.add(random.nextInt(100));
+        for (int i = 0; i < this.SIZE; i++) {
+            this.list.add(random.nextInt(this.listValuesRange));
         }
     }
 
-    public synchronized boolean isListNotNull(){
-        return size > 0;
-    }
-
-    public int getFirstAndRemove(){
-        return this.getFirstOrLastAndRemove(true);
-    }
-
-    public int getLastAndRemove(){
-        return this.getFirstOrLastAndRemove(false);
-    }
-
-    private synchronized int getFirstOrLastAndRemove(boolean isGettingFirst){
+    public synchronized int getFirstOrLastAndRemove(FirstOrLast firstOrLast) throws Exception {
         int value = -1;
-        if(isGettingFirst) {
-            value = list.get(0);
-            this.list.remove(0);
+        if(!list.isEmpty()) {
+            switch (firstOrLast) {
+                case first -> {
+                    value = list.getFirst();
+                    this.list.removeFirst();
+                }
+                case last -> {
+                    value = list.getLast();
+                    this.list.removeLast();
+                }
+                default -> throw new Exception("OnlyFirstOrLasException in List.getFirstOrLastAndRemove()");
+            }
+
+            return value;
         }else{
-            value = list.get(size - 1);
-            this.list.remove(size - 1);
+            throw new IndexOutOfBoundsException();
         }
-        this.size--;
-        return value;
     }
 
 }
