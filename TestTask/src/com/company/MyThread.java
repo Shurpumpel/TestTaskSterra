@@ -17,12 +17,12 @@ public class MyThread extends Thread{
     @Override
     public void run() {
         try {
-            while (true) {
-                this.countOfZerosOrOnes += getCountOfZerosOrOnes(
-                        list.getFirstOrLastAndRemove(this.firstOrLast));
+            int value;
+            while ((value = list.getFirstOrLastAndRemove(
+                    this.firstOrLast)) > -1) {
+                this.countOfZerosOrOnes += getCountOfZerosOrOnes(value);
                 countOfCheckedValues++;
             }
-        }catch (IndexOutOfBoundsException ignored){
         }catch (Exception e){
             System.out.println(e.getMessage());
         }
@@ -30,17 +30,16 @@ public class MyThread extends Thread{
 
     private int getCountOfZerosOrOnes(int value) throws Exception {
         int count = 0;
-        int numberOfCheckedBits = 32 - Integer.numberOfLeadingZeros(value);
         switch (this.firstOrLast){
             case first:
-                for (int i = 0; i < numberOfCheckedBits; i++) {
+                for (int i = 0; i < 32; i++) {
                     if((value & 1) == 0)
                         count++;
                     value >>>= 1;
                 }
                 break;
             case last:
-                for (int i = 0; i < numberOfCheckedBits; i++) {
+                for (int i = 0; i < 32; i++) {
                     if((value & 1) == 1)
                         count++;
                     value >>>= 1;

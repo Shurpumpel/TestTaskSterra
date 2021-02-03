@@ -16,23 +16,20 @@ public class ListData {
     }
 
     public synchronized int getFirstOrLastAndRemove(FirstOrLast firstOrLast) throws Exception {
-        int value = -1;
+        int value;
         if(!list.isEmpty()) {
             switch (firstOrLast) {
                 case first -> {
-                    value = list.getFirst();
-                    this.list.removeFirst();
+                    value = this.list.removeFirst();
                 }
                 case last -> {
-                    value = list.getLast();
-                    this.list.removeLast();
+                    value = this.list.removeLast();
                 }
                 default -> throw new Exception("OnlyFirstOrLasException in List.getFirstOrLastAndRemove()");
             }
-
             return value;
         }else{
-            throw new IndexOutOfBoundsException();
+            return -1;
         }
     }
 
